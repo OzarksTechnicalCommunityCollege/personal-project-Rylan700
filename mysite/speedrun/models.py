@@ -1,6 +1,6 @@
 from django.db import models
-from django.utils import timezone
 from django.conf import settings
+from django import forms
 
 # Create your models here.
 class VerifiedRunsManager(models.Manager):
@@ -23,6 +23,9 @@ class SpeedRun(models.Model):
     submit_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
 
+    #so that you can upload the video of the speedrun found on django's documentation
+    video = models.FileField(upload_to='Videos/')
+    
     player = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -42,4 +45,4 @@ class SpeedRun(models.Model):
         ordering = ['-hours', '-minutes', '-seconds', '-milliseconds']
 
     def __str__(self):
-        return f'{self.player} - {self.speed_time}'
+        return f'{self.player} - {self.hours, self.minutes, self.seconds, self.milliseconds}'

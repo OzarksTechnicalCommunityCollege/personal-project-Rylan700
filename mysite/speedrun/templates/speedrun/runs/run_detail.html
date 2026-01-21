@@ -1,0 +1,25 @@
+{% extends "speedrun/base.html" %}
+{% block title %}My Run{% endblock %}
+{% block content %}
+
+
+    <h1>{{ run.player.username }}'s SpeedRun</h1>
+
+    <p><strong>Total Time:</strong> Time{{ run.hours }} : {{ run.minutes }} : {{ run.seconds }} : {{ run.milliseconds }}</p>
+
+    <p><strong>Verified:</strong> {{ run.get_verified_display }}</p>
+    <p><strong>Submitted:</strong> {{ run.submit_time }}</p>
+
+    {% if run.video %}
+        <h2>Video:</h2>
+        <video width="640" height="360" controls>
+            <source src="{{ run.video.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    {% else %}
+        <p>No video uploaded for this run.</p>
+    {% endif %}
+
+    <a href="{% url 'run:run_list' %}">Back to all runs</a>
+
+{% endblock %}

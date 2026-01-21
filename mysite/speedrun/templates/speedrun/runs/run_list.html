@@ -1,0 +1,35 @@
+
+
+{% extends "speedrun/base.html" %}
+{% block title %}My Run{% endblock %}
+{% block content %}
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Player</th>
+            <th>Time (seconds)</th>
+            <th>Hours</th>
+            <th>Minutes</th>
+            <th>Seconds</th>
+            <th>Milliseconds</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for run in runs %}
+        <tr>
+            <td>{{ run.player.username }}</td>
+            <td>{{ run.hours }}</td>
+            <td>{{ run.minutes }}</td>
+            <td>{{ run.seconds }}</td>
+            <td>{{ run.milliseconds }}</td>
+            <td><a href="{% url 'run:run_detail' run.id %}">View</a></td>
+        </tr>
+        <tr>
+            <td colspan="7">No verified runs found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
