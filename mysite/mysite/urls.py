@@ -18,10 +18,22 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
+from speedrun.sitemaps import SpeedRunsSitemap
+
+sitemaps = {
+    'posts':SpeedRunsSitemap
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('speedrun/', include('speedrun.urls', namespace='run')),
+     path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+    )
 ]
 
 if settings.DEBUG:

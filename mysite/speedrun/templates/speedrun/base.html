@@ -1,4 +1,5 @@
 {% load static %}
+{% load speed_run_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,5 +18,17 @@
         {% endblock %}
     </div>
     
+    <div id="sidebar">
+    <h2>My Speed Runs</h2>
+    <p>
+      I've ran {% total_runs %} speed runs so far.
+    </p>
+
+    <a href="{% url 'speedrun:run_feed' %}">
+      Look at my Latest Runs
+    </a>
+
+  </div>
+
 </body>
 </html>

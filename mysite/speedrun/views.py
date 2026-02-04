@@ -11,7 +11,7 @@ from .forms import SubmitRunForm
 class GameListView(ListView):
     template_name = 'speedrun/games/game_list.html'  # Template to render
     context_object_name = 'games'                     # Context variable for template
-    paginate_by = 20                                   # Show 20 games per page
+    paginate_by = 5                                   # Show 5 games per page
 
     def get_queryset(self):
         """
@@ -25,7 +25,7 @@ class GameListView(ListView):
 class SpeedRunListView(ListView):
     template_name = 'speedrun/runs/run_list.html'  # Template to render
     context_object_name = 'runs'                   # Context variable for template
-    paginate_by = 20                               # Show 20 runs per page
+    paginate_by = 5                               # Show 5 runs per page
 
     def get_queryset(self):
         """
