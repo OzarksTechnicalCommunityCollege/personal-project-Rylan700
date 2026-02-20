@@ -5,7 +5,14 @@
 
     <h1>{{ run.player.username }}'s SpeedRun</h1>
 
-    <p><strong>Total Time:</strong> Time{{ run.hours }} : {{ run.minutes }} : {{ run.seconds }} : {{ run.milliseconds }}</p>
+    <p><strong>Game:</strong> {{ run.game }}</p>
+
+    <p><strong>Total Time:</strong> 
+        {{ run.hours|stringformat:"02d" }}:
+        {{ run.minutes|stringformat:"02d" }}:
+        {{ run.seconds|stringformat:"02d" }}.
+        {{ run.milliseconds|stringformat:"03d" }}
+    </p>
 
     <p><strong>Verified:</strong> {{ run.get_verified_display }}</p>
     <p><strong>Submitted:</strong> {{ run.submit_time }}</p>
@@ -20,6 +27,6 @@
         <p>No video uploaded for this run.</p>
     {% endif %}
 
-    <a href="{% url 'run:run_list' %}">Back to all runs</a>
+    <a href="{% url 'speedrun:game_runs' run.game %}">Back to {{ run.game }} runs</a>
 
 {% endblock %}
