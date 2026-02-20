@@ -28,12 +28,15 @@ sitemaps = {
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('speedrun/', include('speedrun.urls', namespace='run')),
-     path(
+    path('accounts/', include('django.contrib.auth.urls')),  # built-in auth URLs
+
+    path(
         'sitemap.xml',
         sitemap,
         {'sitemaps': sitemaps},
         name='django.contrib.sitemaps.views.sitemap'
     )
+    
 ]
 
 if settings.DEBUG:

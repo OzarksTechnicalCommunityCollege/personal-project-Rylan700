@@ -3,11 +3,34 @@
 
 {% block content %}
 
+<!-- Login/Register or Welcome -->
+{% if user.is_authenticated %}
+  <p>Welcome, {{ user.username }}!
+    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit">Log out</button>
+    </form>
+  </p>
+  <p>
+    <a href="{% url 'edit' %}">Edit your profile</a> or 
+    <a href="{% url 'password_change' %}">change your password</a>.
+  </p>
+{% else %}
+  <p>
+    <a href="{% url 'speedrun:login' %}">Log in</a> |
+    <a href="{% url 'speedrun:register' %}">Register</a>
+  </p>
+{% endif %}
+
 <!-- Link to go back to the Games page -->
 <p><a href="{% url 'speedrun:game_list' %}">← Back to all games</a></p>
 
-<!-- Link to submit a new run -->
-<p><a href="{% url 'speedrun:submit_run' %}" class="submit-run-link">Submit a New Run</a></p>
+<!-- Link to submit a new run (only show if logged in) -->
+{% if user.is_authenticated %}
+  <p><a href="{% url 'speedrun:submit_run' %}" class="submit-run-link">Submit a New Run</a></p>
+{% else %}
+  <p><em>Log in to submit a new run.</em></p>
+{% endif %}
 
 <table border="1">
     <thead>
