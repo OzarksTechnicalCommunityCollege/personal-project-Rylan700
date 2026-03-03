@@ -26,6 +26,11 @@ SECRET_KEY = 'django-insecure-#ebv-gmjgt+httv&l_1o&rib*iy8wr3h^#asdd&k8o=!-@7jn^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+if DEBUG:
+    import mimetypes
+    mimetypes.add_type('application/javascript', '.js', True)
+    mimetypes.add_type('text/css', '.css', True)
+
 ALLOWED_HOSTS = []
 
 
@@ -41,7 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
-    'speedrun.apps.SpeedrunConfig'
+    'speedrun.apps.SpeedrunConfig',
+    'django_extensions',
+    'images.apps.ImagesConfig'
 ]
 
 MIDDLEWARE = [
