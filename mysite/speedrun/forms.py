@@ -18,6 +18,22 @@ class SubmitRunForm(forms.ModelForm):
             'milliseconds',
             'video'
         ]
+        
+    def clean_video(self):
+        video = self.cleaned_data.get('video')
+
+        if not video:
+            return video
+
+        valid_extensions = ['mp4', 'mp3']
+        extension = video.name.rsplit('.', 1)[-1].lower()
+
+        if extension not in valid_extensions:
+            raise forms.ValidationError(
+                'Only MP3 or MP4 files are allowed.'
+            )
+
+        return video
 
 class LoginForm(forms.Form):
     username = forms.CharField()
