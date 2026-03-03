@@ -1,0 +1,52 @@
+{% extends "speedrun/base.html" %}
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+
+<h2>My Submitted Runs</h2>
+
+<p>
+  <a href="{% url 'speedrun:submit_run' %}">
+    ➕ Submit New Run
+  </a>
+</p>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Game</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for run in runs %}
+    <tr>
+        <td>{{ run.game }}</td>
+        <td>
+            {{ run.hours }}:
+            {{ run.minutes }}:
+            {{ run.seconds }}:
+            {{ run.milliseconds }}
+        </td>
+        <td>
+            {% if run.verified == "Y" %}
+                ✅ Verified
+            {% else %}
+                ⏳ Pending
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ run.get_absolute_url }}">View</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">You haven't submitted any runs yet.</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -26,6 +26,8 @@ urlpatterns = [
     # View details of a specific run
     path('run/<str:game>/<str:player_username>/<int:id>/', views.run_detail, name='run_detail'),
 
+    path('my-runs/', views.my_runs_dashboard, name='my_runs'),
+
     # List of verified runs for a specific game
     path('<str:game>/', views.SpeedRunListView.as_view(), name='game_runs'),
 ]

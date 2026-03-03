@@ -1,12 +1,11 @@
 from django.shortcuts import get_object_or_404, render
 from .models import SpeedRun
 from django.views.generic import ListView
-from .forms import SubmitRunForm, LoginForm, UserEditForm, ProfileEditForm
+from .forms import SubmitRunForm, LoginForm, UserEditForm, ProfileEditForm, UserRegistrationForm
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from .models import Profile
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm
 
 # ========================
 # Class-Based Views
@@ -170,4 +169,16 @@ def edit(request):
             'user_form': user_form,
             'profile_form': profile_form
         }
+    )
+
+@login_required
+def my_runs_dashboard(request):
+    runs = SpeedRun.objects.filter(
+        player=request.user
+    ).order_by('-submit_time')
+
+    return render(
+        request,
+        'speedrun/runs/my_runs_dashboard.html',
+        {'runs': runs}
     )
