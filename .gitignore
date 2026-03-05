@@ -211,3 +211,6 @@ __marimo__/
 
 #ignore videos
 media/
+
+*.crt
+*.key
