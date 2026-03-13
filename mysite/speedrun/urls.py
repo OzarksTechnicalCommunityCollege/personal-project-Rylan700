@@ -15,7 +15,10 @@ urlpatterns = [
 
     # Submit a new speed run
     path('run/', views.submit_run, name='submit_run'),
-
+    
+    # Make a new catagory
+    path('create_category/', views.create_category, name='create_category'),
+    
     # Feed for latest runs
     path('feed/', LatestRun(), name='run_feed'),
 

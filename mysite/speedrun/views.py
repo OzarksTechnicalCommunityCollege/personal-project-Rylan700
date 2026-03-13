@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404, render
 from .models import SpeedRun
 from django.views.generic import ListView
-from .forms import SubmitRunForm, LoginForm, UserEditForm, ProfileEditForm, UserRegistrationForm
+from .forms import SubmitRunForm, LoginForm, UserEditForm, ProfileEditForm, UserRegistrationForm, CategoryForm
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
-from .models import Profile
+from .models import Profile, Category
 from django.contrib.auth.decorators import login_required
 
 # ========================
@@ -66,7 +66,25 @@ def run_detail(request, game, player_username, id):
     )
 
 
-# TO DO find a way to get players to sign in to that they dont put in a user name
+@login_required
+def create_category(request):
+    """
+    Allows logged-in users to create a new category.
+    """
+    new_category = None
+
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            new_category = form.save()  # Save the new category
+            return render(request, 'speedrun/categories/category_created.html', {
+                'new_category': new_category
+            })
+    else:
+        form = CategoryForm()
+
+    return render(request, 'speedrun/categories/create_category.html', {'form': form})
+
 
 # View to handle submission of a new speed run
 @login_required

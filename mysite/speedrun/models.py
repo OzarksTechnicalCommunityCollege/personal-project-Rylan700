@@ -19,6 +19,18 @@ class VerifiedRunsManager(models.Manager):
 # Main Model
 # ========================
 
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class SpeedRun(models.Model):
     # Choices for verified status
     class Verified(models.TextChoices):
@@ -46,6 +58,13 @@ class SpeedRun(models.Model):
         settings.AUTH_USER_MODEL,  # Link to Django's User model
         on_delete=models.CASCADE,  # Delete runs if user is deleted
         related_name='runs'         # Access via user.runs
+    )
+
+    # Speedrun Catagories
+    categories = models.ManyToManyField(
+    Category,
+    related_name='runs',
+    blank=True
     )
 
     # Verified status
@@ -88,24 +107,3 @@ class Profile(models.Model):
     )
     def __str__(self):
         return f'Profile of {self.user.username}'
-
-# added this to prove understading
-class Image(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        related_name='images_created',
-        on_delete=models.CASCADE
-    )
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, blank=True)
-    url = models.URLField(max_length=2000)
-    image = models.ImageField(upload_to='images/%Y/%m/%d/')
-    description = models.TextField(blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        indexes = [
-            models.Index(fields=['-created']),
-        ]
-        ordering = ['-created']
-    def __str__(self):
-        return self.title

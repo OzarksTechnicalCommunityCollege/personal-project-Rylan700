@@ -10,7 +10,7 @@
     </form>
   </p>
   <p>
-    <a href="{% url 'edit' %}">Edit your profile</a> or 
+    <a href="{% url 'speedrun:edit' %}">Edit your profile</a>
     <a href="{% url 'password_change' %}">change your password</a>.
   </p>
 {% else %}
@@ -29,7 +29,7 @@
 <div class="game-list">
   {% for game in games %}
     <div class="game-card">
-      <a href="{% url 'speedrun:game_runs' game=game.id %}">{{ game.name }}</a>
+      <a href="{% url 'speedrun:game_runs' game=game %}">{{ game }}</a>
     </div>
   {% empty %}
     <p>No games found.</p>

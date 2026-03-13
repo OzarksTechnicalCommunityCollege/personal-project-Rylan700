@@ -1,23 +1,25 @@
 from django import forms
-from .models import SpeedRun
-from .models import Profile
+from .models import SpeedRun, Profile, Category
 from django.contrib.auth import get_user_model
-
 
 # ========================
 # Form for submitting a new speed run
 # ========================
 class SubmitRunForm(forms.ModelForm):
     class Meta:
-        model = SpeedRun  # The model this form is based on
+        model = SpeedRun
         fields = [
             'game',
             'hours',
             'minutes',
             'seconds',
             'milliseconds',
-            'video'
+            'video',
+            'categories',  # add this to allow selecting categories
         ]
+        widgets = {
+            'categories': forms.CheckboxSelectMultiple(),  # show categories as checkboxes
+        }
         
     def clean_video(self):
         video = self.cleaned_data.get('video')
@@ -35,6 +37,19 @@ class SubmitRunForm(forms.ModelForm):
 
         return video
 
+
+# ========================
+# Form to create a new category
+# ========================
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name', 'slug']
+
+
+# ========================
+# Login and User forms
+# ========================
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)

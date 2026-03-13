@@ -1,0 +1,12 @@
+{% extends "speedrun/base.html" %}
+{% block title %}Category Created{% endblock %}
+{% block content %}
+
+<h2>Create New Category</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create</button>
+</form>
+
+{% endblock %}

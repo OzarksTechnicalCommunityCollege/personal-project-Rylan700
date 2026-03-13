@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'speedrun.apps.SpeedrunConfig',
     'django_extensions',
-    'images.apps.ImagesConfig'
 ]
 
 MIDDLEWARE = [
