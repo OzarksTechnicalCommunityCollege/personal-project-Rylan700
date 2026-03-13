@@ -2,10 +2,11 @@ from django.shortcuts import get_object_or_404, render
 from .models import SpeedRun
 from django.views.generic import ListView
 from .forms import SubmitRunForm, LoginForm, UserEditForm, ProfileEditForm, UserRegistrationForm, CategoryForm
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from .models import Profile, Category
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 # ========================
 # Class-Based Views
@@ -27,19 +28,21 @@ class GameListView(ListView):
 
 # View to display all verified runs for a specific game
 class SpeedRunListView(ListView):
-    template_name = 'speedrun/runs/run_list.html'  # Template to render
-    context_object_name = 'runs'                   # Context variable for template
-    paginate_by = 5                               # Show 5 runs per page
+    template_name = 'speedrun/runs/run_list.html'
+    context_object_name = 'runs'
+    paginate_by = 5
 
     def get_queryset(self):
-        """
-        Returns all verified runs for a given game.
-        Orders runs by time: hours -> minutes -> seconds -> milliseconds.
-        """
-        game_name = self.kwargs['game']  # Get the game name from URL
+        game_name = self.kwargs['game']
         return SpeedRun.verified_runs.filter(game=game_name).order_by(
             'hours', 'minutes', 'seconds', 'milliseconds'
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category_form'] = CategoryForm()  # Add empty form to context
+        context['game_name'] = self.kwargs['game']  # Pass game name for reference
+        return context
 
 # ========================
 # Function-Based Views
@@ -200,3 +203,33 @@ def my_runs_dashboard(request):
         'speedrun/runs/my_runs_dashboard.html',
         {'runs': runs}
     )
+
+
+@require_POST
+@login_required
+def add_category(request):
+    """
+    Add a new category via POST and return JSON like user_follow.
+    """
+    name = request.POST.get('name', '').strip()
+    slug = request.POST.get('slug', '').strip()
+
+    if not name:
+        return JsonResponse({'status': 'error', 'message': 'Category name is required.'})
+
+    try:
+        category, created = Category.objects.get_or_create(
+            name=name,
+            defaults={'slug': slug or name.replace(' ', '-').lower()}
+        )
+        if created:
+            return JsonResponse({
+                'status': 'ok',
+                'id': category.id,
+                'name': category.name,
+                'slug': category.slug
+            })
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Category already exists.'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})

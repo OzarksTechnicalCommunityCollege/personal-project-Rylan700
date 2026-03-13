@@ -1,12 +1,70 @@
 {% extends "speedrun/base.html" %}
-{% block title %}Category Created{% endblock %}
+{% block title %}Create Category{% endblock %}
+
 {% block content %}
 
 <h2>Create New Category</h2>
-<form method="post">
+
+<!-- Category form -->
+<form id="category-form" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Create</button>
 </form>
 
+<!-- Display messages -->
+<div id="category-message"></div>
+
+<!-- List of categories -->
+<ul id="category-list">
+    {% for cat in categories %}
+        <li data-id="{{ cat.id }}">{{ cat.name }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
+
+{% block domready %}
+const url = '{% url "speedrun:add_category" %}';
+const form = document.querySelector('#category-form');
+const messageDiv = document.querySelector('#category-message');
+const categoryList = document.querySelector('#category-list');
+
+form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    fetch(url, {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrftoken},
+        body: formData,
+        mode: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            // Add new category to the list
+            const li = document.createElement('li');
+            li.textContent = data.name;
+            li.dataset.id = data.id;
+            categoryList.appendChild(li);
+
+            // Clear form inputs
+            form.reset();
+
+            // Show success message
+            messageDiv.textContent = `Category "${data.name}" created successfully!`;
+            messageDiv.style.color = 'green';
+        } else {
+            messageDiv.textContent = data.message || 'Error creating category.';
+            messageDiv.style.color = 'red';
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        messageDiv.textContent = 'An unexpected error occurred.';
+        messageDiv.style.color = 'red';
+    });
+});
 {% endblock %}

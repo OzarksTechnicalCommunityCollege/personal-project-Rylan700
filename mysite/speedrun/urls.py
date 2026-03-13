@@ -18,7 +18,9 @@ urlpatterns = [
     
     # Make a new catagory
     path('create_category/', views.create_category, name='create_category'),
-    
+
+    path('add_category/', views.add_category, name='add_category'),
+
     # Feed for latest runs
     path('feed/', LatestRun(), name='run_feed'),
 
