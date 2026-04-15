@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import ListView
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
@@ -107,24 +107,37 @@ def create_category(request):
 @login_required
 def submit_run(request):
 
-    submitted_run = None
-
+    # ========================
+    # POST request (form submitted)
+    # ========================
     if request.method == "POST":
         form = SubmitRunForm(request.POST, request.FILES)
 
         if form.is_valid():
             submitted_run = form.save(commit=False)
 
-            # Assign current user as player (model enforces this too)
+            # Assign current user as player
             submitted_run.player = request.user
-
             submitted_run.save()
 
-            return render(request, 'speedrun/runs/submit_run.html', {
-                'submitted_run': submitted_run
-            })
+            # ========================
+            # SESSION: store last submitted game
+            # ========================
+            request.session['last_submitted_game'] = submitted_run.game
+
+            # ========================
+            # IMPORTANT FIX: avoid duplicate submissions
+            # Redirect instead of re-rendering POST response
+            # ========================
+            return redirect(submitted_run.get_absolute_url())
+
+    # ========================
+    # GET request (show form)
+    # ========================
     else:
-        form = SubmitRunForm()
+        form = SubmitRunForm(initial={
+            'game': request.session.get('last_submitted_game')
+        })
 
     return render(
         request,
