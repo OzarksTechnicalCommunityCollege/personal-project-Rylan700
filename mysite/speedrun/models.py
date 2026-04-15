@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django import forms
 from django.urls import reverse
 
 # ========================
@@ -13,6 +12,10 @@ class VerifiedRunsManager(models.Manager):
         return super().get_queryset().filter(
             verified=SpeedRun.Verified.VERIFIED
         )
+
+    # Returns verified runs for a specific game
+    def for_game(self, game_name):
+        return self.get_queryset().filter(game=game_name)
 
 
 # ========================
@@ -46,25 +49,28 @@ class SpeedRun(models.Model):
     seconds = models.PositiveIntegerField()
     milliseconds = models.PositiveIntegerField()
 
+    # Store total time in milliseconds for efficient sorting
+    total_time = models.PositiveIntegerField(editable=False, null=True)
+
     # Timestamp fields
-    submit_time = models.DateTimeField(auto_now_add=True)  # Set when run is created
-    updated_time = models.DateTimeField(auto_now=True)     # Updated on each save
+    submit_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
 
     # Video file upload
     video = models.FileField(upload_to='Videos/')
 
     # Player who submitted the run
     player = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # Link to Django's User model
-        on_delete=models.CASCADE,  # Delete runs if user is deleted
-        related_name='runs'         # Access via user.runs
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='runs'
     )
 
-    # Speedrun Catagories
+    # Speedrun Categories
     categories = models.ManyToManyField(
-    Category,
-    related_name='runs',
-    blank=True
+        Category,
+        related_name='runs',
+        blank=True
     )
 
     # Verified status
@@ -75,16 +81,42 @@ class SpeedRun(models.Model):
     )
 
     # Managers
-    objects = models.Manager()             # Default manager
-    verified_runs = VerifiedRunsManager()  # Custom manager
+    objects = models.Manager()
+    verified_runs = VerifiedRunsManager()
 
     class Meta:
-        ordering = ['hours', 'minutes', 'seconds', 'milliseconds']  # Default ordering
+        # Order by computed total time instead of individual fields
+        ordering = ['total_time']
 
     def __str__(self):
-        return f'{self.game} | {self.player} - {self.hours, self.minutes, self.seconds, self.milliseconds}'
+        # Clean readable format instead of tuple
+        return f"{self.game} | {self.player} - {self.hours:02}:{self.minutes:02}:{self.seconds:02}.{self.milliseconds:03}"
 
-    #Returns URL to view the detail of this speed run.
+    # ========================
+    # Custom Behavior Methods
+    # ========================
+
+    # Converts time fields into total milliseconds
+    def total_milliseconds(self):
+        return (
+            self.hours * 3600000 +
+            self.minutes * 60000 +
+            self.seconds * 1000 +
+            self.milliseconds
+        )
+
+    # Override save to automatically calculate total_time
+    def save(self, *args, **kwargs):
+        # Ensure player exists before saving
+        if not self.player_id:
+            raise ValueError("SpeedRun must have a player")
+
+        # Calculate total time before saving
+        self.total_time = self.total_milliseconds()
+
+        super().save(*args, **kwargs)
+
+    # Returns URL to view the detail of this speed run.
     def get_absolute_url(self):
         return reverse(
             'speedrun:run_detail',
@@ -94,6 +126,7 @@ class SpeedRun(models.Model):
                 self.id
             ],
         )
+
 
 class Profile(models.Model):
     user = models.OneToOneField(
@@ -105,5 +138,6 @@ class Profile(models.Model):
         upload_to='users/%Y/%m/%d/',
         blank=True
     )
+
     def __str__(self):
         return f'Profile of {self.user.username}'
