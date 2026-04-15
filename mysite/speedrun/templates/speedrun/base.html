@@ -1,34 +1,52 @@
 {% load static %}
 {% load speed_run_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <link href="{% static "css/speedrun.css" %}" rel="stylesheet">
+    <link href="{% static 'css/speedrun.css' %}" rel="stylesheet">
 </head>
 
 <body>
-    <div id="content">
-        {% block content %}
-        {% endblock %}
 
-        {% block pagination %}
-        {% endblock %}
-    </div>
-    
-    <div id="sidebar">
+<header>
+    <nav>
+        <a href="{% url 'speedrun:game_list' %}">Games</a>
+        <a href="{% url 'speedrun:my_runs' %}">My Runs</a>
+
+        {% if user.is_authenticated %}
+            <span>Hi {{ user.username }}</span>
+
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'speedrun:login' %}">Login</a>
+            <a href="{% url 'speedrun:register' %}">Register</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main id="content">
+    {% block content %}{% endblock %}
+</main>
+
+<aside id="sidebar">
     <h2>My Speed Runs</h2>
-    <p>
-      I've ran {% total_runs %} speed runs so far.
-    </p>
+    <p>I've run {% total_runs %} speed runs so far.</p>
 
     <a href="{% url 'speedrun:run_feed' %}">
-      Look at my Latest Runs
+        Latest Runs
     </a>
+</aside>
 
-  </div>
+<footer>
+    {% block pagination %}{% endblock %}
+</footer>
 
 </body>
 </html>

@@ -1,29 +1,13 @@
 {% extends "speedrun/base.html" %}
+
 {% block title %}All Games{% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
-  <p>Welcome, {{ user.username }}!
-    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-      {% csrf_token %}
-      <button type="submit">Log out</button>
-    </form>
-  </p>
-  <p>
-    <a href="{% url 'speedrun:edit' %}">Edit your profile</a>
-    <a href="{% url 'password_change' %}">change your password</a>.
-  </p>
-{% else %}
-  <p>
-    <a href="{% url 'speedrun:login' %}">Log in</a> |
-    <a href="{% url 'speedrun:register' %}">Register</a>
-  </p>
-{% endif %}
 
 <h1>All Games</h1>
 
 <p>
-  <a href="{% url 'speedrun:submit_run' %}" class="submit-run-link" aria-label="Submit a New Run">➕ Submit a New Run</a>
+  <a href="{% url 'speedrun:submit_run' %}">➕ Submit a New Run</a>
 </p>
 
 <div class="game-list">
@@ -35,24 +19,5 @@
     <p>No games found.</p>
   {% endfor %}
 </div>
-{% endblock %}
 
-{% block pagination %}
-{% if is_paginated %}
-<div class="pagination">
-  <span class="step-links">
-    {% if page_obj.has_previous %}
-      <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-    {% endif %}
-
-    <span class="current">
-      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-    </span>
-
-    {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">Next</a>
-    {% endif %}
-  </span>
-</div>
-{% endif %}
 {% endblock %}

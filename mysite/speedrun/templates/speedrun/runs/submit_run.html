@@ -3,7 +3,6 @@
 {% block title %}Run Submitted{% endblock %}
 
 {% block content %}
-<div id="content">
     <div class="confirmation-card">
         <h2>✅ Your Run Has Been Submitted!</h2>
         <p>Thank you for submitting your speedrun. You can view your run or explore other runs below.</p>
@@ -12,5 +11,4 @@
             <a href="{% url 'speedrun:game_runs' submitted_run.game %}">Back To All Runs For This Game</a>
         </div>
     </div>
-</div>
 {% endblock %}
