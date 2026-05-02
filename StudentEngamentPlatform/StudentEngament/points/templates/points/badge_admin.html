@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Badge Admin{% endblock %}
+
+{% block content %}
+
+<h1>Badge Administration</h1>
+
+<!-- =========================
+     CREATE BADGE
+========================= -->
+<h2>Create Badge</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create Badge</button>
+</form>
+
+<hr>
+
+<!-- =========================
+     BADGE LIST
+========================= -->
+<h2>All Badges</h2>
+
+{% for badge in badges %}
+    <div class="badge-card">
+
+        {% if badge.icon %}
+            <img src="{{ badge.icon.url }}" width="60">
+        {% endif %}
+
+        <h3>{{ badge.name }}</h3>
+        <p>{{ badge.description }}</p>
+
+        <p>
+            <strong>Type:</strong>
+            {{ badge.get_acquisition_type_display }}
+        </p>
+
+        {% if badge.shop_price %}
+            <p>Cost: {{ badge.shop_price }} pts</p>
+        {% endif %}
+
+        {% if badge.required_events %}
+            <p>Requires: {{ badge.required_events }} events</p>
+        {% endif %}
+
+    </div>
+{% empty %}
+    <p>No badges yet.</p>
+{% endfor %}
+
+<hr>
+
+<!-- =========================
+     USER BADGES
+========================= -->
+<h2>User Badges</h2>
+
+<table>
+    <tr>
+        <th>User</th>
+        <th>Badge</th>
+        <th>Unlocked</th>
+    </tr>
+
+    {% for ub in user_badges %}
+    <tr>
+        <td>{{ ub.user.username }}</td>
+        <td>{{ ub.badge.name }}</td>
+        <td>{{ ub.unlocked_at }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

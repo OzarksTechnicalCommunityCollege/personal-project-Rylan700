@@ -1,0 +1,271 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* =========================
+   GLOBAL CONTAINER
+========================= */
+#content {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+h1 {
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+/* =========================
+   EVENT CARDS
+========================= */
+.event-card {
+    background: white;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.event-card h2 {
+    margin-top: 0;
+}
+
+/* =========================
+   ACTION BUTTONS / LINKS
+========================= */
+.actions {
+    margin-top: 10px;
+}
+
+.actions a {
+    display: inline-block;
+    padding: 8px 12px;
+    margin-right: 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    background: #2d6cdf;
+    color: white;
+    transition: 0.2s;
+}
+
+.actions a:hover {
+    background: #1b4fb3;
+}
+
+/* =========================
+   FORMS
+========================= */
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 12px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #218838;
+}
+
+/* =========================
+   TABLES (Leaderboard)
+========================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+th {
+    background: #f0f2f5;
+}
+
+/* =========================
+   SIMPLE LISTS (badges, attendance)
+========================= */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background: white;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.06);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2d6cdf;
+    padding: 12px 20px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+}
+
+/* =========================
+   BALANCE BAR
+========================= */
+.balance-bar {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.balance-box {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-weight: bold;
+}
+
+/* =========================
+   SHOP GRID
+========================= */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.shop-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.shop-card h2 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+}
+
+.shop-meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.cost {
+    font-weight: bold;
+    color: #2d6cdf;
+}
+
+button.disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+/* =========================
+   BADGE GRID
+========================= */
+.badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.badge-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.badge-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+#popup-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.popup {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    animation: fadeIn 0.3s ease;
+}
+
+.popup.success {
+    background: #22c55e;
+}
+
+.popup.error {
+    background: #ef4444;
+}
+
+.popup.info {
+    background: #3b82f6;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

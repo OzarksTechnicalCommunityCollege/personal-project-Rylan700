@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Shop{% endblock %}
+
+{% block content %}
+
+<h1>Shop</h1>
+
+<div class="balance-bar">
+    <strong>Shop Points:</strong> {{ shop_points }}
+</div>
+
+<!-- =========================
+     BADGES
+========================= -->
+<h2>Badges</h2>
+
+<div class="shop-grid">
+    {% for badge in badges %}
+        <div class="shop-card">
+
+            <!-- Badge Image -->
+            {% if badge.icon %}
+                <img src="{{ badge.icon.url }}" alt="{{ badge.name }}" class="badge-icon">
+            {% else %}
+                <div class="badge-placeholder">No Image</div>
+            {% endif %}
+
+            <h3>{{ badge.name }}</h3>
+            <p>{{ badge.description }}</p>
+
+            <p><strong>Cost:</strong> {{ badge.shop_price }}</p>
+
+            <form method="post" action="{% url 'points:purchase_item' %}">
+                {% csrf_token %}
+
+                <input type="hidden" name="item_type" value="badge">
+                <input type="hidden" name="item_id" value="{{ badge.id }}">
+
+                {% if badge.shop_price and shop_points >= badge.shop_price %}
+                    <button type="submit">Buy Badge</button>
+                {% else %}
+                    <button type="button" disabled>Not enough points</button>
+                {% endif %}
+            </form>
+
+        </div>
+
+    {% empty %}
+        <p>No badges available in the shop.</p>
+    {% endfor %}
+</div>
+
+
+<!-- =========================
+     VOUCHERS
+========================= -->
+<h2>Vouchers</h2>
+
+<div class="shop-grid">
+    {% for voucher in vouchers %}
+        <div class="shop-card">
+
+            <h3>{{ voucher.name }}</h3>
+            <p>{{ voucher.description }}</p>
+
+            <p><strong>Cost:</strong> {{ voucher.cost }}</p>
+
+            <form method="post" action="{% url 'points:purchase_item' %}">
+                {% csrf_token %}
+
+                <input type="hidden" name="item_type" value="voucher">
+                <input type="hidden" name="item_id" value="{{ voucher.id }}">
+
+                {% if shop_points >= voucher.cost %}
+                    <button type="submit">Buy Voucher</button>
+                {% else %}
+                    <button type="button" disabled>Not enough points</button>
+                {% endif %}
+            </form>
+
+        </div>
+
+    {% empty %}
+        <p>No vouchers available in the shop.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

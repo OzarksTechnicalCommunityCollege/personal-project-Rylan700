@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Events Feed{% endblock %}
+
+{% block content %}
+
+<h1>Events</h1>
+
+{% for item in event_cards %}
+
+<div class="event-card">
+
+    <h2>{{ item.event.title }}</h2>
+
+    <p>{{ item.event.description }}</p>
+
+    <p><strong>Location:</strong> {{ item.event.location }}</p>
+    <p><strong>Start:</strong> {{ item.event.start_time }}</p>
+    <p><strong>End:</strong> {{ item.event.end_time }}</p>
+
+    <p><strong>Club:</strong> {{ item.event.club.name }}</p>
+    <p><strong>Status:</strong> {{ item.event.status }}</p>
+
+    <div class="actions">
+
+        <a href="{% url 'events:register_event' item.event.id %}">Register</a>
+
+        {% if item.can_check_in %}
+            <a href="{% url 'events:check_in' item.event.id %}">Check In</a>
+        {% else %}
+            <span class="disabled">Check-in closed</span>
+        {% endif %}
+
+        {% if user.role == "club_admin" %}
+            <a href="{% url 'events:attendance_list' item.event.id %}">Attendance</a>
+        {% endif %}
+
+
+        {% if item.event.status == "completed" and item.attended %}
+
+            {% if not item.survey_done and item.survey %}
+                <a href="{% url 'events:submit_survey' item.survey.id %}">Take Survey</a>
+            {% else %}
+                <span>Survey Completed</span>
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% empty %}
+    <p>No events available.</p>
+{% endfor %}
+
+{% endblock %}

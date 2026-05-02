@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Voucher Admin{% endblock %}
+
+{% block content %}
+
+<h1>Voucher Administration</h1>
+
+<!-- =========================
+     CREATE VOUCHER FORM
+========================= -->
+<h2>Create Voucher</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Name</label>
+    <input type="text" name="name" required>
+
+    <label>Description</label>
+    <textarea name="description"></textarea>
+
+    <label>Cost (Shop Points)</label>
+    <input type="number" name="cost" required>
+
+    <label>Voucher Type</label>
+    <select name="voucher_type" required>
+        <option value="extra_credit">Extra Credit</option>
+        <option value="extension">Deadline Extension</option>
+        <option value="multiplier">Point Multiplier</option>
+    </select>
+
+    <label>Value</label>
+    <input type="number" name="value" value="1">
+
+    <button type="submit">Create Voucher</button>
+</form>
+
+<hr>
+
+<!-- =========================
+     ACTIVE VOUCHERS
+========================= -->
+<h2>Active Vouchers</h2>
+
+{% for v in vouchers %}
+    <div class="event-card">
+
+        <h3>{{ v.name }}</h3>
+        <p>{{ v.description }}</p>
+
+        <p><strong>Type:</strong> {{ v.voucher_type }}</p>
+        <p><strong>Cost:</strong> {{ v.cost }} points</p>
+        <p><strong>Value:</strong> {{ v.value }}</p>
+
+    </div>
+{% empty %}
+    <p>No vouchers yet.</p>
+{% endfor %}
+
+<hr>
+
+<!-- =========================
+     USER VOUCHERS (DEBUG VIEW)
+========================= -->
+<h2>User Vouchers</h2>
+
+<table>
+    <tr>
+        <th>User</th>
+        <th>Voucher</th>
+        <th>Redeemed</th>
+        <th>Purchased At</th>
+    </tr>
+
+    {% for uv in user_vouchers %}
+    <tr>
+        <td>{{ uv.user.username }}</td>
+        <td>{{ uv.voucher.name }}</td>
+        <td>{{ uv.redeemed }}</td>
+        <td>{{ uv.purchased_at }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

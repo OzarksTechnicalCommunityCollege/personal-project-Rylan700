@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Club Join Requests{% endblock %}
+
+{% block content %}
+
+<h1>Club Join Requests</h1>
+
+<!-- =========================
+     REQUEST LIST
+========================= -->
+{% if requests %}
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Club</th>
+                <th>Requested At</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for req in requests %}
+            <tr>
+
+                <td>
+                    {{ req.user.username }}
+                </td>
+
+                <td>
+                    {{ req.club.name }}
+                </td>
+
+                <td>
+                    {{ req.created_at }}
+                </td>
+
+                <td>
+                    {{ req.status }}
+                </td>
+
+                <td>
+
+                    <!-- =========================
+                         APPROVE BUTTON
+                    ========================= -->
+                    {% if req.status == "pending" %}
+                        <form method="post" action="{% url 'clubs:approve_request' req.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit">Approve</button>
+                        </form>
+
+                        <!-- =========================
+                             REJECT BUTTON
+                        ========================= -->
+                        <form method="post" action="{% url 'clubs:reject_request' req.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background:#dc3545;">
+                                Reject
+                            </button>
+                        </form>
+                    {% else %}
+                        <em>No actions available</em>
+                    {% endif %}
+
+                </td>
+
+            </tr>
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+{% else %}
+
+    <p>No join requests at the moment.</p>
+
+{% endif %}
+
+{% endblock %}

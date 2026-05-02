@@ -1,0 +1,6 @@
+django
+django-filter
+qrcode[pil]
+Pillow
+django-debug-toolbar
+requests

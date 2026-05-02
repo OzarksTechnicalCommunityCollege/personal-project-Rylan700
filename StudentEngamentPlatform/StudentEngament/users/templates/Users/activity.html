@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Activity{% endblock %}
+
+{% block content %}
+
+    <h1>{{ user_obj.username }} Activity</h1>
+
+    <p>Attendance: {{ attendance }}</p>
+    <p>Registrations: {{ registrations }}</p>
+    <p>Badges: {{ badges }}</p>
+    <p>Points: {{ points }}</p>
+
+{% endblock %}

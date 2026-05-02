@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+    <h1>{{ user_obj.username }}</h1>
+
+    <p>Role: {{ user_obj.role }}</p>
+
+    <p>Events Registered: {{ registration_count }}</p>
+    <p>Events Attended: {{ attendance_count }}</p>
+
+    <hr>
+
+    <h2>Primary Club</h2>
+
+    {% if primary_club %}
+        <p><strong>{{ primary_club.name }}</strong></p>
+    {% else %}
+        <p>You are not in a club yet.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>All Clubs</h2>
+
+    <ul>
+    {% for club in clubs %}
+        <li>
+            <strong>{{ club.name }}</strong>
+
+            {% if club.admin == user_obj %}
+                - Admin
+
+            {% elif club.id in memberships %}
+                - {{ memberships|default_if_none:"Member" }}
+
+            {% else %}
+                <form method="post" action="{% url 'users:request_join_club' club.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Request to Join</button>
+                </form>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+
+    <hr>
+
+    <hr>
+
+    <h2>Your Vouchers</h2>
+
+    {% if user_obj.uservoucher_set.all %}
+
+        <ul>
+            {% for uv in user_obj.uservoucher_set.all %}
+
+                <li>
+                    <strong>{{ uv.voucher.name }}</strong>
+
+                    {% if uv.redeemed %}
+                        <span>(Redeemed)</span>
+                    {% else %}
+                        <form method="post" action="{% url 'points:redeem_voucher' uv.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Use</button>
+                        </form>
+                    {% endif %}
+                </li>
+
+            {% endfor %}
+        </ul>
+
+    {% else %}
+        <p>No vouchers yet.</p>
+    {% endif %}
+
+{% endblock %}
