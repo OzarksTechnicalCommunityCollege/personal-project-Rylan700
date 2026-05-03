@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
 
     'users',
-    'events',
+    'events.apps.EventsConfig',
     'points',
 ]
 

@@ -28,26 +28,27 @@ def event_feed(request):
     now = timezone.now()
     one_week_ago = now - timedelta(days=7)
 
-    # =========================
-    # EVENTS
-    # =========================
     events = Event.objects.filter(
         Q(status="published") |
         Q(status="completed", end_time__gte=one_week_ago)
     ).select_related("club").order_by("-start_time")
 
     # =========================
-    # USER STATE MAPS
+    # HANDLE ANONYMOUS USERS
     # =========================
-    attended_events = set(
-        Attendance.objects.filter(student=request.user)
-        .values_list("event_id", flat=True)
-    )
+    if request.user.is_authenticated:
+        attended_events = set(
+            Attendance.objects.filter(student=request.user)
+            .values_list("event_id", flat=True)
+        )
 
-    submitted_surveys = set(
-        SurveyResponse.objects.filter(student=request.user)
-        .values_list("survey__event_id", flat=True)
-    )
+        submitted_surveys = set(
+            SurveyResponse.objects.filter(student=request.user)
+            .values_list("survey__event_id", flat=True)
+        )
+    else:
+        attended_events = set()
+        submitted_surveys = set()
 
     surveys = {
         s.event_id: s for s in Survey.objects.all()
@@ -61,7 +62,7 @@ def event_feed(request):
     for event in events:
         event_cards.append({
             "event": event,
-            "can_check_in": event.is_active(),
+            "can_check_in": event.is_active() and request.user.is_authenticated,
             "survey": surveys.get(event.id),
             "attended": event.id in attended_events,
             "survey_done": event.id in submitted_surveys,
@@ -153,13 +154,7 @@ def register_event(request, event_id):
 # CHECK-IN (QR OR MANUAL)
 # =========================
 def check_in(request, event_id):
-    from django.contrib import messages
-from django.shortcuts import redirect, get_object_or_404
-from django.utils import timezone
-
-def check_in(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-
     now = timezone.now()
 
     if not (event.start_time <= now <= event.end_time):
@@ -172,17 +167,7 @@ def check_in(request, event_id):
     )
 
     if created:
-        PointTransaction.objects.create(
-            user=request.user,
-            leaderboard_points=15,
-            shop_points=15,
-            reason=f"Event attendance: {event.id}",
-            source_type="event",
-            source_id=str(event.id)
-        )
-
         messages.success(request, "You successfully checked in!")
-
     else:
         messages.info(request, "You are already checked in.")
 
@@ -228,15 +213,9 @@ def submit_survey(request, survey_id):
 
     now = timezone.now()
 
-    # =========================
-    # ONLY AFTER EVENT ENDS
-    # =========================
     if now <= event.end_time:
         return HttpResponse("Survey only available after event ends.")
 
-    # =========================
-    # MUST HAVE ATTENDED
-    # =========================
     attended = Attendance.objects.filter(
         event=event,
         student=request.user
@@ -245,9 +224,6 @@ def submit_survey(request, survey_id):
     if not attended:
         return HttpResponse("You must attend the event to complete the survey.")
 
-    # =========================
-    # ONLY ONE SURVEY RESPONSE
-    # =========================
     existing = SurveyResponse.objects.filter(
         survey=survey,
         student=request.user
@@ -256,9 +232,6 @@ def submit_survey(request, survey_id):
     if existing:
         return HttpResponse("You already submitted this survey.")
 
-    # =========================
-    # CREATE SURVEY RESPONSE
-    # =========================
     rating = request.POST.get("rating")
     feedback = request.POST.get("feedback", "")
 
@@ -271,23 +244,5 @@ def submit_survey(request, survey_id):
         rating=rating,
         feedback=feedback
     )
-
-    # =========================
-    # GIVE POINTS
-    # =========================
-    already_rewarded = PointTransaction.objects.filter(
-        user=request.user,
-        reason=f"Survey completion: {event.id}"
-    ).exists()
-
-    if not already_rewarded:
-        PointTransaction.objects.create(
-            user=request.user,
-            leaderboard_points=30,
-            shop_points=30,
-            reason=f"Event attendance: {event.id}",
-            source_type="event",
-            source_id=str(event.id)
-        )
 
     return redirect("events:event_feed")
