@@ -10,6 +10,9 @@
 
 <div class="event-card">
 
+    <!-- =========================
+         EVENT HEADER
+    ========================= -->
     <h2>{{ item.event.title }}</h2>
 
     <p>{{ item.event.description }}</p>
@@ -21,29 +24,75 @@
     <p><strong>Club:</strong> {{ item.event.club.name }}</p>
     <p><strong>Status:</strong> {{ item.event.status }}</p>
 
+    <!-- =========================
+         ACTION BUTTONS
+    ========================= -->
     <div class="actions">
 
-        <a href="{% url 'events:register_event' item.event.id %}">Register</a>
+        {% if user.is_authenticated %}
 
-        {% if item.can_check_in %}
-            <a href="{% url 'events:check_in' item.event.id %}">Check In</a>
-        {% else %}
-            <span class="disabled">Check-in closed</span>
-        {% endif %}
+            <!-- =========================
+                 REGISTRATION
+            ========================= -->
+            <a href="{% url 'events:register_event' item.event.id %}">
+                {% if item.attended %}
+                    Registered ✓
+                {% else %}
+                    Register
+                {% endif %}
+            </a>
 
-        {% if user.role == "club_admin" %}
-            <a href="{% url 'events:attendance_list' item.event.id %}">Attendance</a>
-        {% endif %}
-
-
-        {% if item.event.status == "completed" and item.attended %}
-
-            {% if not item.survey_done and item.survey %}
-                <a href="{% url 'events:submit_survey' item.survey.id %}">Take Survey</a>
+            <!-- =========================
+                 CHECK-IN
+            ========================= -->
+            {% if item.can_check_in %}
+                <a href="{% url 'events:check_in' item.event.id %}">
+                    Check In
+                </a>
+            {% elif item.attended %}
+                <span class="disabled">Already Checked In</span>
             {% else %}
-                <span>Survey Completed</span>
+                <span class="disabled">Check-in unavailable</span>
             {% endif %}
 
+            <!-- =========================
+                 ATTENDANCE (ADMIN ONLY)
+            ========================= -->
+            {% if user.role == "club_admin" %}
+                <a href="{% url 'events:attendance_list' item.event.id %}">
+                    Attendance
+                </a>
+            {% endif %}
+
+            <!-- =========================
+                 SURVEY SECTION
+            ========================= -->
+            {% if item.event.status == "completed" %}
+
+                {% if item.attended %}
+
+                    {% if item.survey %}
+
+                        {% if not item.survey_done %}
+                            <a href="{% url 'events:submit_survey' item.survey.id %}">
+                                Take Survey
+                            </a>
+                        {% else %}
+                            <span class="completed">Survey Completed ✓</span>
+                        {% endif %}
+
+                    {% else %}
+                        <span class="disabled">Survey not available</span>
+                    {% endif %}
+
+                {% else %}
+                    <span class="disabled">Attend event to unlock survey</span>
+                {% endif %}
+
+            {% endif %}
+
+        {% else %}
+            <span class="disabled">Login to interact with events</span>
         {% endif %}
 
     </div>

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Event Survey{% endblock %}
+
+{% block content %}
+
+<div class="survey-container">
+
+    <h1>{{ event.title }} Feedback</h1>
+    <p>We value your feedback. Please rate your experience.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- =========================
+             RATING (1–5)
+        ========================= -->
+        <label>Rating (1–5)</label>
+        <div class="rating-group">
+            {% for i in "12345" %}
+                <label>
+                    <input type="radio" name="rating" value="{{ i }}" required>
+                    {{ i }}
+                </label>
+            {% endfor %}
+        </div>
+
+        <!-- =========================
+             FEEDBACK TEXT
+        ========================= -->
+        <label for="feedback">Additional Feedback</label>
+        <textarea name="feedback" id="feedback" rows="5"
+                  placeholder="Tell us what you thought..."></textarea>
+
+        <button type="submit">Submit Survey</button>
+    </form>
+
+</div>
+
+{% endblock %}

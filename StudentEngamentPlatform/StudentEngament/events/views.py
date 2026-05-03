@@ -195,13 +195,22 @@ def attendance_list(request, event_id):
 def update_event_statuses():
     now = timezone.now()
 
-    # =========================
-    # AUTO COMPLETE EVENTS
-    # =========================
-    Event.objects.filter(
+    completed_events = Event.objects.filter(
         status="published",
         end_time__lt=now
-    ).update(status="completed")
+    )
+
+    for event in completed_events:
+        event.status = "completed"
+        event.save()
+
+        # =========================
+        # AUTO CREATE SURVEY
+        # =========================
+        Survey.objects.get_or_create(
+            event=event,
+            defaults={"title": f"{event.title} Feedback"}
+        )
 
 
 # =========================
@@ -210,39 +219,37 @@ def update_event_statuses():
 def submit_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id)
     event = survey.event
-
     now = timezone.now()
 
+    # must be after event ends
     if now <= event.end_time:
         return HttpResponse("Survey only available after event ends.")
 
-    attended = Attendance.objects.filter(
-        event=event,
-        student=request.user
-    ).exists()
-
-    if not attended:
+    # must have attended
+    if not Attendance.objects.filter(event=event, student=request.user).exists():
         return HttpResponse("You must attend the event to complete the survey.")
 
-    existing = SurveyResponse.objects.filter(
-        survey=survey,
-        student=request.user
-    ).exists()
-
-    if existing:
+    # prevent duplicates
+    if SurveyResponse.objects.filter(survey=survey, student=request.user).exists():
         return HttpResponse("You already submitted this survey.")
 
-    rating = request.POST.get("rating")
-    feedback = request.POST.get("feedback", "")
+    if request.method == "POST":
+        rating = request.POST.get("rating")
+        feedback = request.POST.get("feedback", "")
 
-    if not rating:
-        return HttpResponse("Rating is required.")
+        if not rating:
+            return HttpResponse("Rating is required.")
 
-    SurveyResponse.objects.create(
-        survey=survey,
-        student=request.user,
-        rating=rating,
-        feedback=feedback
-    )
+        SurveyResponse.objects.create(
+            survey=survey,
+            student=request.user,
+            rating=int(rating),
+            feedback=feedback
+        )
 
-    return redirect("events:event_feed")
+        return redirect("events:event_feed")
+
+    return render(request, "events/survey_form.html", {
+        "survey": survey,
+        "event": event
+    })
