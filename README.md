@@ -16,7 +16,7 @@ A Django-based platform to manage student engagement, clubs, events, attendance,
 
 - Python
 - Django
-- SQLite (can be swapped for PostgreSQL)
+- SQLite
 - HTML / CSS / JavaScript
 
 ## Project Structure
