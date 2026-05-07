@@ -148,16 +148,19 @@ def request_join_club(request, club_id):
 def club_requests(request, club_id):
     club = get_object_or_404(Club, id=club_id)
 
+    # safety check
     if request.user != club.admin:
         return redirect("users:user_profile", user_id=request.user.id)
 
-    pending = ClubMembership.objects.filter(club=club, status="pending")
+    requests = ClubMembership.objects.filter(
+        club=club,
+        status="pending"
+    ).select_related("user")
 
     return render(request, "users/club_requests.html", {
         "club": club,
-        "pending": pending
+        "requests": requests
     })
-
 
 @club_admin_required
 # =========================

@@ -26,24 +26,58 @@
     <h2>All Clubs</h2>
 
     <ul>
+
     {% for club in clubs %}
+
         <li>
+
             <strong>{{ club.name }}</strong>
 
             {% if club.admin == user_obj %}
+
                 - Admin
 
-            {% elif club.id in memberships %}
-                - {{ memberships|default_if_none:"Member" }}
-
             {% else %}
-                <form method="post" action="{% url 'users:request_join_club' club.id %}">
-                    {% csrf_token %}
-                    <button type="submit">Request to Join</button>
-                </form>
+
+                {% with user_memberships=user_obj.club_memberships.all %}
+
+                    {% with found_membership=None %}
+
+                        {% for membership in user_memberships %}
+
+                            {% if membership.club == club %}
+
+                                - {{ membership.status }}
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% endwith %}
+
+                {% endwith %}
+
+                {% if club.id not in memberships %}
+
+                    <form method="post"
+                        action="{% url 'users:request_join_club' club.id %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit">
+                            Request to Join
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
             {% endif %}
+
         </li>
+
     {% endfor %}
+
     </ul>
 
     <hr>

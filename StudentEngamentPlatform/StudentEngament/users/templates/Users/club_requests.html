@@ -3,82 +3,80 @@
 
 {% block content %}
 
-<h1>Club Join Requests</h1>
+<h1>{{ club.name }} Join Requests</h1>
 
-<!-- =========================
-     REQUEST LIST
-========================= -->
 {% if requests %}
 
-    <table>
+<table border="1" cellpadding="8">
 
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Club</th>
-                <th>Requested At</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Requested At</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
 
-        <tbody>
+    <tbody>
 
-        {% for req in requests %}
-            <tr>
+    {% for req in requests %}
+        <tr>
 
-                <td>
-                    {{ req.user.username }}
-                </td>
+            <td>{{ req.user.username }}</td>
 
-                <td>
-                    {{ req.club.name }}
-                </td>
+            <td>{{ req.requested_at }}</td>
 
-                <td>
-                    {{ req.created_at }}
-                </td>
+            <td>{{ req.status }}</td>
 
-                <td>
-                    {{ req.status }}
-                </td>
+            <td>
 
-                <td>
+                {% if req.status == "pending" %}
 
-                    <!-- =========================
-                         APPROVE BUTTON
-                    ========================= -->
-                    {% if req.status == "pending" %}
-                        <form method="post" action="{% url 'clubs:approve_request' req.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit">Approve</button>
-                        </form>
+                    <!-- APPROVE -->
+                    <form method="post"
+                          action="{% url 'users:approve_membership' req.id %}"
+                          style="display:inline;">
 
-                        <!-- =========================
-                             REJECT BUTTON
-                        ========================= -->
-                        <form method="post" action="{% url 'clubs:reject_request' req.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" style="background:#dc3545;">
-                                Reject
-                            </button>
-                        </form>
-                    {% else %}
-                        <em>No actions available</em>
-                    {% endif %}
+                        {% csrf_token %}
 
-                </td>
+                        <button type="submit">
+                            Approve
+                        </button>
 
-            </tr>
-        {% endfor %}
+                    </form>
 
-        </tbody>
+                    <!-- REJECT -->
+                    <form method="post"
+                          action="{% url 'users:reject_membership' req.id %}"
+                          style="display:inline;">
 
-    </table>
+                        {% csrf_token %}
+
+                        <button type="submit">
+                            Reject
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <em>No actions available</em>
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+    {% endfor %}
+
+    </tbody>
+
+</table>
 
 {% else %}
 
-    <p>No join requests at the moment.</p>
+<p>No pending join requests.</p>
 
 {% endif %}
 
