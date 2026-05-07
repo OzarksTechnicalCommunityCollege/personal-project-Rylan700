@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .decorators import club_admin_required
 from .models import UserBadge, Club, ClubMembership
@@ -194,3 +195,49 @@ def reject_membership(request, membership_id):
     membership.save()
 
     return redirect("users:club_requests", club_id=membership.club.id)
+
+# =========================
+# Get a list of all members in a club (for admin view)
+# =========================
+@club_admin_required
+def club_members_api(request, club_id):
+
+    club = get_object_or_404(Club, id=club_id)
+
+    members = ClubMembership.objects.filter(
+        club=club,
+        status="approved"
+    ).select_related("user")
+
+    data = []
+
+    for member in members:
+        data.append({
+            "id": member.user.id,
+            "username": member.user.username,
+            "joined": member.approved_at
+        })
+
+    return JsonResponse(data, safe=False)
+
+# =========================
+# CLUB MEMBERS PAGE
+# =========================
+@club_admin_required
+def club_members_page(request, club_id):
+
+    club = get_object_or_404(Club, id=club_id)
+
+    # security check
+    if request.user != club.admin:
+        return redirect("users:user_profile", user_id=request.user.id)
+
+    members = ClubMembership.objects.filter(
+        club=club,
+        status="approved"
+    ).select_related("user")
+
+    return render(request, "users/club_members.html", {
+        "club": club,
+        "members": members
+    })

@@ -33,4 +33,9 @@ urlpatterns = [
     # approve / reject specific membership request
     path("clubs/membership/approve/<int:membership_id>/", views.approve_membership, name="approve_membership"),
     path("clubs/membership/reject/<int:membership_id>/", views.reject_membership, name="reject_membership"),
+    # HTML PAGE
+    path("clubs/<int:club_id>/members/",views.club_members_page,name="club_members"),
+
+    # API ENDPOINT
+    path("api/clubs/<int:club_id>/members/",views.club_members_api,name="club_members_api"),
 ]

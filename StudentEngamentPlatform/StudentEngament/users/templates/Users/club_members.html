@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+Club Members
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ club.name }} Members</h1>
+
+{% if members %}
+
+    <table border="1" cellpadding="8">
+
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Joined Club</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for member in members %}
+
+            <tr>
+
+                <td>
+                    {{ member.user.id }}
+                </td>
+
+                <td>
+                    {{ member.user.username }}
+                </td>
+
+                <td>
+
+                    {% if member.approved_at %}
+                        {{ member.approved_at }}
+                    {% else %}
+                        Not Available
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+{% else %}
+
+    <p>No approved members found.</p>
+
+{% endif %}
+
+{% endblock %}
