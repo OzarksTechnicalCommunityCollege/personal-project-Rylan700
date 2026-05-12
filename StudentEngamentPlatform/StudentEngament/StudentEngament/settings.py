@@ -68,7 +68,7 @@ MIDDLEWARE = [
 # URL CONFIG
 # =========================
 
-ROOT_URLCONF = 'StudentEngagement.urls'
+ROOT_URLCONF = 'StudentEngament.urls'
 
 
 # =========================
