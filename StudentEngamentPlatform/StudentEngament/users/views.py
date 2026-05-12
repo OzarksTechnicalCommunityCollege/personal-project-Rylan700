@@ -1,6 +1,12 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count, Avg, Sum
+from django.db.models.functions import TruncDate
+from events.models import Event, Attendance, SurveyResponse
+from points.models import PointTransaction
 from .decorators import club_admin_required
 from .models import UserBadge, Club, ClubMembership
 from events.models import Attendance, EventRegistration 
@@ -241,3 +247,138 @@ def club_members_page(request, club_id):
         "club": club,
         "members": members
     })
+
+
+# =========================
+# Club Dashboard View
+# =========================
+@club_admin_required
+def club_dashboard(request):
+
+    club = Club.objects.filter(admin=request.user).first()
+
+    if not club:
+        return redirect("events:event_feed")
+
+    # =========================
+    # BASIC COUNTS
+    # =========================
+    total_members = ClubMembership.objects.filter(
+        club=club,
+        status="approved"
+    ).count()
+
+    pending_requests = ClubMembership.objects.filter(
+        club=club,
+        status="pending"
+    ).count()
+
+    total_events = Event.objects.filter(
+        club=club
+    ).count()
+
+    total_attendance = Attendance.objects.filter(
+        event__club=club
+    ).count()
+
+    # =========================
+    # ATTENDANCE BY EVENT
+    # =========================
+    attendance_by_event = (
+        Attendance.objects
+        .filter(event__club=club)
+        .values("event__title")
+        .annotate(total=Count("id"))
+        .order_by("-total")
+    )
+
+    # =========================
+    # DAILY CHECK-INS
+    # =========================
+    daily_attendance = (
+        Attendance.objects
+        .filter(event__club=club)
+        .annotate(day=TruncDate("checked_in_at"))
+        .values("day")
+        .annotate(total=Count("id"))
+        .order_by("day")
+    )
+
+    # =========================
+    # SURVEY RATINGS
+    # =========================
+    survey_ratings = (
+        SurveyResponse.objects
+        .filter(survey__event__club=club)
+        .values("survey__event__title")
+        .annotate(avg_rating=Avg("rating"))
+        .order_by("-avg_rating")
+    )
+
+    # =========================
+    # CLUB POINTS
+    # =========================
+    points_over_time = (
+        PointTransaction.objects
+        .annotate(day=TruncDate("created_at"))
+        .values("day")
+        .annotate(total=Sum("leaderboard_points"))
+        .order_by("day")
+    )
+
+    context = {
+
+        # =========================
+        # CLUB INFO
+        # =========================
+        "club": club,
+        "total_members": total_members,
+        "pending_requests": pending_requests,
+        "total_events": total_events,
+        "total_attendance": total_attendance,
+
+        # =========================
+        # CHART DATA
+        # =========================
+        "attendance_labels": json.dumps([
+            item["event__title"]
+            for item in attendance_by_event
+        ]),
+
+        "attendance_data": json.dumps([
+            item["total"]
+            for item in attendance_by_event
+        ]),
+
+        "daily_labels": json.dumps([
+            str(item["day"])
+            for item in daily_attendance
+        ]),
+
+        "daily_data": json.dumps([
+            item["total"]
+            for item in daily_attendance
+        ]),
+
+        "survey_labels": json.dumps([
+            item["survey__event__title"]
+            for item in survey_ratings
+        ]),
+
+        "survey_data": json.dumps([
+            float(item["avg_rating"])
+            for item in survey_ratings
+        ]),
+
+        "points_labels": json.dumps([
+            str(item["day"])
+            for item in points_over_time
+        ]),
+
+        "points_data": json.dumps([
+            item["total"] or 0
+            for item in points_over_time
+        ]),
+    }
+
+    return render(request, "users/club_dashboard.html", context)

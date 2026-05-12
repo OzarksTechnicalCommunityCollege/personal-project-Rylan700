@@ -59,13 +59,8 @@
             {% if request.user.managed_clubs.first %}
 
                 <!-- CLUB REQUESTS -->
-                <a href="{% url 'users:club_requests' request.user.managed_clubs.first.id %}">
-                    Club Requests
-                </a>
-
-                <!-- CLUB MEMBERS PAGE -->
-                <a href="{% url 'users:club_members' request.user.managed_clubs.first.id %}">
-                    Club Members
+                <a href="{% url 'users:club_dashboard' %}">
+                    Club Dashboard
                 </a>
 
             {% endif %}
@@ -78,19 +73,6 @@
             <!-- VOUCHER ADMIN -->
             <a href="{% url 'points:voucher_admin' %}">
                 Manage Vouchers
-            </a>
-
-        {% endif %}
-
-
-        <!-- =========================
-             EVENT CREATION
-        ========================= -->
-
-        {% if request.user.is_authenticated and request.user.role != "student" %}
-
-            <a href="{% url 'events:create_event' %}">
-                Create Event
             </a>
 
         {% endif %}

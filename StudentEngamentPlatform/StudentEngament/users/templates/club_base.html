@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% with club=request.user.managed_clubs.first %}
+
+{% if club %}
+
+<div class="navbar">
+
+    <a class="dashboard-btn" href="{% url 'users:club_dashboard' %}">
+        Dashboard
+    </a>
+
+    <a class="dashboard-btn" href="{% url 'users:club_members' club.id %}">
+        Members
+    </a>
+
+    <a class="dashboard-btn" href="{% url 'users:club_requests' club.id %}">
+        Requests
+    </a>
+
+    <a class="dashboard-btn" href="{% url 'events:create_event' %}">
+        Create Event
+    </a>
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+<div class="club-content">
+
+    {% block club_content %}
+    {% endblock %}
+
+</div>
+
+{% endblock %}

@@ -38,4 +38,7 @@ urlpatterns = [
 
     # API ENDPOINT
     path("api/clubs/<int:club_id>/members/",views.club_members_api,name="club_members_api"),
+
+    # club dashboard for admins
+    path("club-dashboard/",views.club_dashboard,name="club_dashboard"),
 ]
